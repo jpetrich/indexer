@@ -308,7 +308,7 @@ export const postOrderV3Options: RouteOptions = {
                   },
                 },
               ]);
-              if (!["success", "already-exists"].includes(result.status)) {
+              if (result && !["success", "already-exists"].includes(result.status)) {
                 const error = Boom.badRequest(result.status);
                 error.output.payload.orderId = orderId;
                 throw error;
