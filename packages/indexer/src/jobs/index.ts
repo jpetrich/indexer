@@ -108,6 +108,7 @@ import { flagStatusUpdateJob } from "@/jobs/flag-status/flag-status-update-job";
 import { tokenFlagStatusSyncJob } from "@/jobs/flag-status/token-flag-status-sync-job";
 import { collectionSlugFlagStatusSyncJob } from "@/jobs/flag-status/collection-slug-flag-status-sync-job";
 import { contractFlagStatusSyncJob } from "@/jobs/flag-status/contract-flag-status-sync-job";
+import { backfillDeleteExpiredBidsElasticsearchJob } from "@/jobs/elasticsearch/activities/backfill/backfill-delete-expired-bids-elasticsearch-job";
 
 import { metadataIndexFetchJob } from "@/jobs/metadata-index/metadata-fetch-job";
 import { metadataIndexProcessJob } from "@/jobs/metadata-index/metadata-process-job";
@@ -193,6 +194,7 @@ import { backfillTokensWithMissingCollectionJob } from "@/jobs/backfill/backfill
 import { recalcOnSaleCountQueueJob } from "@/jobs/collection-updates/recalc-on-sale-count-queue-job";
 import { burnedTokenJob } from "@/jobs/token-updates/burned-token-job";
 import { publishEventToKafkaStreamJob } from "@/jobs/websocket-events/publish-event-to-kafka-stream-job";
+import { backfillInvalidatedPPV2OrdersJob } from "@/jobs/backfill/backfill-invalidated-ppv2-orders";
 
 export const allJobQueues = [
   backfillWrongNftBalances.queue,
@@ -368,6 +370,9 @@ export class RabbitMqJobsConsumer {
       recalcOnSaleCountQueueJob,
       burnedTokenJob,
       publishEventToKafkaStreamJob,
+      backfillInvalidatedPPV2OrdersJob,
+      deleteArchivedExpiredBidActivitiesJob,
+      backfillDeleteExpiredBidsElasticsearchJob,
     ];
   }
 
