@@ -1387,7 +1387,7 @@ export class Router {
 
         case "seaport-v1.6":
           if (!seaportV16Details[currency]) {
-            seaportV15Details[currency] = [];
+            seaportV16Details[currency] = [];
           }
           detailsRef = seaportV16Details[currency];
           break;

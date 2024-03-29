@@ -936,7 +936,22 @@ export const getExecuteSellV7Options: RouteOptions = {
 
       if (payload.source) {
         for (const globalFee of globalFees) {
-          await feeRecipients.getOrInsert(globalFee.recipient, payload.source, "marketplace");
+          const feeRecipient = await feeRecipients.getOrInsert(
+            globalFee.recipient,
+            payload.source,
+            "marketplace"
+          );
+
+          if (feeRecipient.kind !== "marketplace") {
+            logger.info(
+              "fee-recipients",
+              JSON.stringify({
+                message: `feeRecipient already exist with kind royalty`,
+                request: payload,
+                apiKey,
+              })
+            );
+          }
         }
       }
 

@@ -78,8 +78,8 @@ export class FeeRecipients {
   }
 
   public static async syncFeeRecipients() {
-    // Make surce the sources are loaded
-    Sources.getInstance();
+    // Make source the sources are loaded
+    await Sources.getInstance();
     await Sources.syncSources();
     await Sources.forceDataReload();
 
