@@ -505,6 +505,10 @@ export const refreshMintsForCollection = async (collection: string) => {
       case "mirror":
         await mints.mirror.refreshByCollection(collection);
         break;
+
+      case "nfts2me":
+        await mints.nfts2me.refreshByCollection(collection);
+        break;
     }
   }
 
