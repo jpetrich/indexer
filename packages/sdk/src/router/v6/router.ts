@@ -529,7 +529,9 @@ export class Router {
             swapDetails.push({
               tokenIn: buyInCurrency,
               tokenOut: detail.currency,
-              tokenOutAmount: order.params.itemPrice,
+              tokenOutAmount: bn(order.params.itemPrice)
+                .div(order.params.amount)
+                .mul(detail.amount ?? 1),
               recipient: taker,
               refundTo: taker,
               details: [detail],
@@ -646,11 +648,14 @@ export class Router {
       const operator = exchange.contract.address;
 
       for (const d of blockedPaymentProcessorDetails) {
+        const order = d.order as Sdk.PaymentProcessorV2.Order;
         if (buyInCurrency !== d.currency) {
           swapDetails.push({
             tokenIn: buyInCurrency,
             tokenOut: d.currency,
-            tokenOutAmount: d.price,
+            tokenOutAmount: bn(order.params.itemPrice)
+              .div(order.params.amount)
+              .mul(d.amount ?? 1),
             recipient: taker,
             refundTo: taker,
             details: [d],
