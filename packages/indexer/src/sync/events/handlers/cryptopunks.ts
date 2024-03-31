@@ -1,5 +1,6 @@
 import { Interface } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
+import { searchForCall } from "@georgeroman/evm-tx-simulator";
 import * as Sdk from "@reservoir0x/sdk";
 
 import { config } from "@/config/index";
@@ -15,6 +16,8 @@ export const handleEvents = async (events: EnhancedEvent[], onChainData: OnChain
     to: string;
     txHash: string;
   }[] = [];
+
+  let tradeRank = 0;
 
   // Handle the events
   for (const { subKind, baseEventParams, log } of events) {
@@ -94,52 +97,6 @@ export const handleEvents = async (events: EnhancedEvent[], onChainData: OnChain
           toAddress = transfers[transfers.length - 1].to;
         }
 
-        // To get the correct price that the bid was settled at we have to
-        // parse the transaction's calldata and extract the `minPrice` arg
-        // where applicable (if the transaction was a bid acceptance one)
-        const tx = await utils.fetchTransaction(baseEventParams.txHash);
-        const iface = new Interface(["function acceptBidForPunk(uint punkIndex, uint minPrice)"]);
-        try {
-          const result = iface.decodeFunctionData("acceptBidForPunk", tx.data);
-          value = result.minPrice.toString();
-        } catch {
-          // Skip any errors
-        }
-
-        if (value === "0") {
-          // Skip if the sell was for a price of zero (since in that case it was probably
-          // not even a sell, but a hacky way of setting an approval for Cryptopunks)
-          break;
-        }
-
-        const orderSide = toAddress === AddressZero ? "buy" : "sell";
-        const maker = orderSide === "sell" ? fromAddress : toAddress;
-        let taker = orderSide === "sell" ? toAddress : fromAddress;
-
-        // Handle: attribution
-
-        const orderKind = "cryptopunks";
-        const orderId = cryptopunks.getOrderId(tokenId);
-        const attributionData = await utils.extractAttributionData(
-          baseEventParams.txHash,
-          orderKind,
-          { orderId }
-        );
-        if (attributionData.taker) {
-          taker = attributionData.taker;
-        }
-
-        // Handle: prices
-        const priceData = await getUSDAndNativePrices(
-          Sdk.Common.Addresses.Native[config.chainId],
-          value,
-          baseEventParams.timestamp
-        );
-        if (!priceData.nativePrice) {
-          // We must always have the native price
-          break;
-        }
-
         const from = fromAddress;
         const to = toAddress;
 
@@ -184,6 +141,70 @@ export const handleEvents = async (events: EnhancedEvent[], onChainData: OnChain
             tokenId,
           },
         });
+
+        // To get the correct price that the bid was settled at we have to
+        // parse the transaction's calldata and extract the `minPrice` arg
+        // where applicable (if the transaction was a bid acceptance one)
+        const txTrace = await utils.fetchTransactionTrace(baseEventParams.txHash);
+        if (!txTrace) {
+          // Skip any failed attempts to get the trace
+          break;
+        }
+
+        const iface = new Interface(["function acceptBidForPunk(uint punkIndex, uint minPrice)"]);
+        const poolCallTrace = searchForCall(
+          txTrace.calls,
+          {
+            to: Sdk.CryptoPunks.Addresses.Exchange[config.chainId],
+            type: "CALL",
+            sigHashes: [iface.getSighash("acceptBidForPunk")],
+          },
+          tradeRank++
+        );
+        if (!poolCallTrace) {
+          break;
+        }
+
+        try {
+          const result = iface.decodeFunctionData("acceptBidForPunk", poolCallTrace.input);
+          value = result.minPrice.toString();
+        } catch {
+          // Skip any errors
+        }
+
+        if (value === "0") {
+          // Skip if the sell was for a price of zero (since in that case it was probably
+          // not even a sell, but a hacky way of setting an approval for Cryptopunks)
+          break;
+        }
+
+        const orderSide = toAddress === AddressZero ? "buy" : "sell";
+        const maker = orderSide === "sell" ? fromAddress : toAddress;
+        let taker = orderSide === "sell" ? toAddress : fromAddress;
+
+        // Handle: attribution
+
+        const orderKind = "cryptopunks";
+        const orderId = cryptopunks.getOrderId(tokenId);
+        const attributionData = await utils.extractAttributionData(
+          baseEventParams.txHash,
+          orderKind,
+          { orderId }
+        );
+        if (attributionData.taker) {
+          taker = attributionData.taker;
+        }
+
+        // Handle: prices
+        const priceData = await getUSDAndNativePrices(
+          Sdk.Common.Addresses.Native[config.chainId],
+          value,
+          baseEventParams.timestamp
+        );
+        if (!priceData.nativePrice) {
+          // We must always have the native price
+          break;
+        }
 
         onChainData.fillEventsOnChain.push({
           orderId,
