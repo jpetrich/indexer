@@ -67,7 +67,7 @@ export const doCancel = async ({
 }) => {
   const success = await verifyOffChainCancellationSignature(orderIds, signature, maker);
   if (!success) {
-    throw new Error("Cancellation failed");
+    throw new Error("Invalid signature");
   }
 
   // Save cancellations

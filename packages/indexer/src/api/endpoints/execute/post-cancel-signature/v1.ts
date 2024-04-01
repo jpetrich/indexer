@@ -52,9 +52,9 @@ export const postCancelSignatureV1Options: RouteOptions = {
   response: {
     schema: Joi.object({
       message: Joi.string(),
-    }).label(`postPermitSignature${version.toUpperCase()}Response`),
+    }).label(`postCancelSignature${version.toUpperCase()}Response`),
     failAction: (_request, _h, error) => {
-      logger.error(`post-permit-signature-${version}-handler`, `Wrong response schema: ${error}`);
+      logger.error(`post-cancel-signature-${version}-handler`, `Wrong response schema: ${error}`);
       throw error;
     },
   },
@@ -143,12 +143,6 @@ export const postCancelSignatureV1Options: RouteOptions = {
             return { message: "Success" };
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
-            logger.error(
-              `post-cancel-signature-${version}-handler`,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              JSON.stringify({ msg: "seaport", error, stack: (error as any).stack })
-            );
-
             if (error.response?.data) {
               throw Boom.badRequest(error.response.data.message);
             }
@@ -185,12 +179,11 @@ export const postCancelSignatureV1Options: RouteOptions = {
             });
 
             return { message: "Success" };
-          } catch (error) {
-            logger.error(
-              `post-cancel-signature-${version}-handler`,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              JSON.stringify({ msg: "pp-v2", error, stack: (error as any).stack })
-            );
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (error: any) {
+            if (error.response?.data) {
+              throw Boom.badRequest(error.response.data.message);
+            }
 
             throw Boom.badRequest("Cancellation failed");
           }

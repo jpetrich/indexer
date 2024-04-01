@@ -158,7 +158,7 @@ export const doReplacement = async ({ replacedOrders, newOrders, orderKind }: Re
     }
 
     if (order.params.offerer.toLowerCase() !== orderSigner?.toLowerCase()) {
-      throw new Error("Signer mismatch");
+      throw new Error("Invalid signature");
     }
 
     if (bn(order.params.salt).isZero()) {
