@@ -637,7 +637,9 @@ export const getExecuteCancelV3Options: RouteOptions = {
         steps,
       };
     } catch (error) {
-      logger.error(`get-execute-cancel-${version}-handler`, `Handler failure: ${error}`);
+      if (!Boom.isBoom(error)) {
+        logger.error(`get-execute-cancel-${version}-handler`, `Handler failure: ${error}`);
+      }
       throw error;
     }
   },
