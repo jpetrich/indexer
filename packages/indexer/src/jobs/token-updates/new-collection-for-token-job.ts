@@ -1,5 +1,5 @@
 import { idb, pgp, PgPromiseQuery } from "@/common/db";
-import { toBuffer } from "@/common/utils";
+import { regex, toBuffer } from "@/common/utils";
 import { AbstractRabbitMqJobHandler, BackoffStrategy } from "@/jobs/abstract-rabbit-mq-job-handler";
 import { logger } from "@/common/logger";
 import { recalcTokenCountQueueJob } from "@/jobs/collection-updates/recalc-token-count-queue-job";
@@ -194,7 +194,7 @@ export class NewCollectionForTokenJob extends AbstractRabbitMqJobHandler {
         return;
       }
 
-      if (this.updateActivities(contract)) {
+      if (this.updateActivities(contract, newCollectionId, oldCollectionId)) {
         // Trigger async job to recalc the daily volumes
         await updateCollectionDailyVolumeJob.addToQueue({
           newCollectionId: collection.id,
@@ -285,7 +285,7 @@ export class NewCollectionForTokenJob extends AbstractRabbitMqJobHandler {
     }
   }
 
-  public updateActivities(contract: string) {
+  public updateActivities(contract: string, newCollectionId: string, oldCollectionId: string) {
     if (config.chainId === 1) {
       return (
         _.indexOf(
@@ -299,7 +299,16 @@ export class NewCollectionForTokenJob extends AbstractRabbitMqJobHandler {
     }
 
     if (config.chainId === 137) {
-      return _.indexOf(["0x2953399124f0cbb46d2cbacd8a89cf0599974963"], contract) === -1;
+      if (_.indexOf(["0x2953399124f0cbb46d2cbacd8a89cf0599974963"], contract) !== -1) {
+        if (
+          oldCollectionId.match(regex.sharedContract) &&
+          newCollectionId.match(regex.sharedContract)
+        ) {
+          return true;
+        }
+
+        return false;
+      }
     }
 
     return true;

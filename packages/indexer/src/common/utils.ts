@@ -127,6 +127,7 @@ export const regex = {
   ipv4: /^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$/,
   address: /^0x[a-fA-F0-9]{40}$/,
   collectionId: /^0x[a-fA-F0-9]{40}(?::\d+:\d+)?$/,
+  sharedContract: /^0x[a-fA-F0-9]{40}(?:.+-.+)?$/,
   bytes32: /^0x[a-fA-F0-9]{64}$/,
   bytes: /^0x[a-fA-F0-9]*$/,
   token: /^0x[a-fA-F0-9]{40}:[0-9]+$/,
