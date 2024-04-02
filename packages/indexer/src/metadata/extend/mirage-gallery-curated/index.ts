@@ -5,6 +5,8 @@ import { logger } from "@/common/logger";
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
 import axios from "axios";
 
+export const isSharedContract = true;
+
 function getProjectID(tokenId: number) {
   const tokenStr = tokenId.toString();
   if (tokenStr.length === 5) {

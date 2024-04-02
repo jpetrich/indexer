@@ -48,7 +48,7 @@ export default class DeleteArchivedExpiredBidActivitiesJob extends AbstractRabbi
     }
   }
 
-  public async addToQueue(delay = 0) {
+  public async addToQueue(delay = 5000) {
     if (!config.doElasticsearchWork) {
       return;
     }

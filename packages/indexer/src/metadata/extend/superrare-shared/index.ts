@@ -2,6 +2,9 @@ import { Contract, utils } from "ethers";
 import { baseProvider } from "@/common/provider";
 import axios from "axios";
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
+
+export const isSharedContract = true;
+
 export const extendCollection = async (metadata: CollectionMetadata, _tokenId: number) => {
   const nft = new Contract(
     metadata.contract,

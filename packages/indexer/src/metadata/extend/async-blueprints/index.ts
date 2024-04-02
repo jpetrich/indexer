@@ -2,6 +2,8 @@
 
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
 
+export const isSharedContract = true;
+
 const collectionsTokenIdRange = [
   [0, 665], // Grifters by XCOPY
   [666, 1289], // DecentralEyesMashup by Coldie

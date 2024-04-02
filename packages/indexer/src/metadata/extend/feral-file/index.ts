@@ -2,6 +2,8 @@
 
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
 
+export const isSharedContract = true;
+
 const collectionsTokenIdRange = [
   [
     "Winslow Homer's Croquet Challenge by Mitchell F. Chan",

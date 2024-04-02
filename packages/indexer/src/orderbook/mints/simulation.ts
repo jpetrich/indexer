@@ -102,7 +102,11 @@ export const simulateCollectionMint = async (
     return false;
   };
 
-  if (detectMaxMintsPerWallet && collectionMint.maxMintsPerWallet === undefined) {
+  if (
+    detectMaxMintsPerWallet &&
+    collectionMint.maxMintsPerWallet === undefined &&
+    collectionMint.maxMintsPerTransaction != "1"
+  ) {
     const quantitiesToTry = [1, 2, 5, 10, 11];
     const results = await Promise.all(quantitiesToTry.map((q) => simulate(q)));
 

@@ -57,6 +57,9 @@ export const hasExtendCollectionHandler = (contract: string) =>
 export const isOpenseaSlugSharedContract = (contract: string) =>
   extendCollection[`${config.chainId},${contract}`]?.constructor?.name === "ExtendLogic";
 
+export const isSharedContract = (contract: string) =>
+  Boolean(extendCollection[`${config.chainId},${contract.toLowerCase()}`]?.isSharedContract);
+
 export const extendCollectionMetadata = async (metadata: any, tokenId?: string) => {
   if (metadata) {
     if (extendCollection[`${config.chainId},${metadata.id}`]) {
@@ -100,6 +103,7 @@ export const extendMetadata = async (metadata: TokenMetadata) => {
 
 class ExtendLogic {
   public prefix: string;
+  public isSharedContract = true;
 
   constructor(prefix: string) {
     this.prefix = prefix;

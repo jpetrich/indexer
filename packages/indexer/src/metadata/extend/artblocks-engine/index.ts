@@ -6,6 +6,8 @@ import axios from "axios";
 import slugify from "slugify";
 import { logger } from "@/common/logger";
 
+export const isSharedContract = true;
+
 export const extendCollection = async (metadata: CollectionMetadata, _tokenId = null) => {
   if (isNaN(Number(_tokenId)) || !_tokenId) {
     throw new Error(`Invalid tokenId ${_tokenId}`);

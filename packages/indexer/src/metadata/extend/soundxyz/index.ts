@@ -11,6 +11,8 @@ import { config } from "@/config/index";
 export const SoundxyzArtistContracts = ArtistContracts.map((c) => c.toLowerCase());
 export const SoundxyzReleaseContracts = ReleaseContracts.map((c) => c.toLowerCase());
 
+export const isSharedContract = true;
+
 // generated from graphql:codegen outside this repo
 export type SoundNftQuery = {
   nft: {

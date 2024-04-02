@@ -3,6 +3,8 @@
 
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
 
+export const isSharedContract = true;
+
 export const extendCollection = async (metadata: CollectionMetadata, _tokenId = null) => {
   metadata.id = `${metadata.contract}:courtyard-${metadata.slug}`;
   metadata.tokenIdRange = null;

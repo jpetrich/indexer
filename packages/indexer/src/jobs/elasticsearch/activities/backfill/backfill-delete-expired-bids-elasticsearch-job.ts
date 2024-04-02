@@ -119,7 +119,7 @@ export class BackfillDeleteExpiredBidsElasticsearchJob extends AbstractRabbitMqJ
     }
   }
 
-  public async addToQueue(collectionId?: string, cursor?: string | null, delay = 1000) {
+  public async addToQueue(collectionId?: string, cursor?: string | null, delay = 5000) {
     if (!config.doElasticsearchWork) {
       return;
     }

@@ -50,3 +50,5 @@ custom["999,0xe6a65c982ffa589a934fa93ab59e6e9646f25763"] = mintTest;
 
 // Azuki
 customTokenURI["137,0xc1c2144b3e4e22f4205545e965f52ebc77a1c952"] = azuki;
+customTokenURI["137,0xa45b6fb131e9fae666898a64be132e1a78fb7394"] = azuki;
+customTokenURI["137,0xa81ac7a8b848ad22e80a1078b5a47f646c1c4510"] = azuki;

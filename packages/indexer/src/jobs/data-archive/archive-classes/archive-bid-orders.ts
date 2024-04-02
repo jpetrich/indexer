@@ -122,7 +122,7 @@ export class ArchiveBidOrders implements ArchiveInterface {
   }
 
   async deleteFromTable(startTime: string, endTime: string) {
-    const limit = 5000;
+    const limit = 1000;
     let deletedOrdersResult;
     let deleteActivities = false;
 
@@ -144,9 +144,9 @@ export class ArchiveBidOrders implements ArchiveInterface {
 
       logger.info(
         "archive-bid-orders",
-        `Bids deleted. ${startTime} - ${endTime} deletedOrdersCount=${JSON.stringify(
-          deletedOrdersResult?.length
-        )}`
+        `Bids deleted. ${startTime} - ${endTime}. deleteExpiredBidsElasticsearch=${
+          config.deleteExpiredBidsElasticsearch
+        }, deletedOrdersCount=${JSON.stringify(deletedOrdersResult?.length)}`
       );
 
       if (deletedOrdersResult.length && config.deleteExpiredBidsElasticsearch) {
@@ -161,7 +161,7 @@ export class ArchiveBidOrders implements ArchiveInterface {
     } while (deletedOrdersResult.length === limit);
 
     if (deleteActivities) {
-      await deleteArchivedExpiredBidActivitiesJob.addToQueue();
+      await deleteArchivedExpiredBidActivitiesJob.addToQueue(0);
     }
   }
 }

@@ -3,6 +3,8 @@
 import { CollectionMetadata } from "@/metadata/types";
 import _ from "lodash";
 
+export const isSharedContract = true;
+
 export const extendCollection = async (metadata: CollectionMetadata, _tokenId = null) => {
   let startTokenId;
   let endTokenId;

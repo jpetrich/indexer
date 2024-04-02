@@ -4,6 +4,8 @@ import { logger } from "@/common/logger";
 import { config } from "@/config/index";
 import axios from "axios";
 
+export const isSharedContract = true;
+
 export const extendCollection = async (metadata: any, _tokenId = null) => {
   metadata.community = null;
   metadata.tokenIdRange = null;
