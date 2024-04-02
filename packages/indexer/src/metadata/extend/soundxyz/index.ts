@@ -11,6 +11,7 @@ import { config } from "@/config/index";
 export const SoundxyzArtistContracts = ArtistContracts.map((c) => c.toLowerCase());
 export const SoundxyzReleaseContracts = ReleaseContracts.map((c) => c.toLowerCase());
 
+// This param indicate this is a shared contract logic that handles multiple collections sharing the same contract
 export const isSharedContract = true;
 
 // generated from graphql:codegen outside this repo

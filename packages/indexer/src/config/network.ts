@@ -181,7 +181,6 @@ type NetworkSettings = {
   mintsAsSalesBlacklist: string[];
   mintAddresses: string[];
   burnAddresses: string[];
-  multiCollectionContracts: string[];
   whitelistedCurrencies: Map<string, Currency>;
   supportedBidCurrencies: { [currency: string]: boolean };
   coingecko?: {
@@ -219,7 +218,6 @@ export const getNetworkSettings = (): NetworkSettings => {
     trendingExcludedContracts: [],
     customTokenAddresses: [],
     nonSimulatableContracts: [],
-    multiCollectionContracts: [],
     mintsAsSalesBlacklist: [],
     mintAddresses: [
       AddressZero,
@@ -285,24 +283,6 @@ export const getNetworkSettings = (): NetworkSettings => {
           "0x06d51314d152ca4f88d691f87b40cf3bf453df7c",
           "0x39fdf1b13dd5b86eb8b7fdd50bce4607beae0722",
           "0x63605e53d422c4f1ac0e01390ac59aaf84c44a51",
-        ],
-        multiCollectionContracts: [
-          // ArtBlocks Contracts
-          "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a",
-          "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
-          "0x99a9b7c1116f9ceeb1652de04d5969cce509b069",
-          // ArtBlocks Engine Contracts
-          "0xbdde08bd57e5c9fd563ee7ac61618cb2ecdc0ce0",
-          "0x28f2d3805652fb5d359486dffb7d08320d403240",
-          "0x64780ce53f6e966e18a22af13a2f97369580ec11",
-          "0x010be6545e14f1dc50256286d9920e833f809c6a",
-          "0x13aae6f9599880edbb7d144bb13f1212cee99533",
-          "0xa319c382a702682129fcbf55d514e61a16f97f9c",
-          "0xd10e3dee203579fcee90ed7d0bdd8086f7e53beb",
-          "0x62e37f664b5945629b6549a87f8e10ed0b6d923b",
-          "0x0a1bbd57033f57e7b6743621b79fcb9eb2ce3676",
-          "0x942bc2d3e7a589fe5bd4a5c6ef9727dfd82f5c8a",
-          "0x32d4be5ee74376e08038d652d4dc26e62c67f436",
         ],
         nonSimulatableContracts: [
           "0x4d04bba7f5ea45ac59769a1095762467b1157cc4",
@@ -592,14 +572,6 @@ export const getNetworkSettings = (): NetworkSettings => {
           "0xc36442b4a4522e871399cd717abdd847ab11fe88",
         ],
         washTradingExcludedContracts: [
-          // ArtBlocks Contracts
-          "0xda62f67be7194775a75be91cbf9feedcc5776d4b",
-          // Sound.xyz Contracts
-          "0xbe8f3dfce2fcbb6dd08a7e8109958355785c968b",
-          // ArtBlocks Engine Contracts
-          "0xe480a895de49b49e37a8f0a8bd7e07fc9844cdb9",
-        ],
-        multiCollectionContracts: [
           // ArtBlocks Contracts
           "0xda62f67be7194775a75be91cbf9feedcc5776d4b",
           // Sound.xyz Contracts
@@ -986,10 +958,6 @@ export const getNetworkSettings = (): NetworkSettings => {
           // Prohibition Contracts - ArtBlocks Engine
           "0x47a91457a3a1f700097199fd63c039c4784384ab",
         ],
-        multiCollectionContracts: [
-          // Prohibition Contracts - ArtBlocks Engine
-          "0x47a91457a3a1f700097199fd63c039c4784384ab",
-        ],
         whitelistedCurrencies: new Map([
           [
             Sdk.Common.Addresses.Usdc[config.chainId][1],
@@ -1147,12 +1115,6 @@ export const getNetworkSettings = (): NetworkSettings => {
             },
           ],
         ]),
-        multiCollectionContracts: [
-          // ArtBlocks Contracts
-          "0xda62f67be7194775a75be91cbf9feedcc5776d4b",
-          // ArtBlocks Engine Contracts
-          "0xe745243b82ebc46e5c23d9b1b968612c65d45f3d",
-        ],
         onStartup: async () => {
           // Insert the native currency
           await Promise.all([

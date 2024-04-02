@@ -6,6 +6,7 @@ import slugify from "slugify";
 import { CollectionMetadata, TokenMetadata } from "@/metadata/types";
 import { logger } from "@/common/logger";
 
+// This param indicate this is a shared contract logic that handles multiple collections sharing the same contract
 export const isSharedContract = true;
 
 export const extendCollection = async (metadata: CollectionMetadata, _tokenId = null) => {

@@ -3,6 +3,7 @@ import { Attributes } from "@/models/attributes";
 import { Tokens } from "@/models/tokens";
 import { config } from "@/config/index";
 import _ from "lodash";
+import { logger } from "@/common/logger";
 
 export type ResyncAttributeCacheJobPayload = {
   contract: string;
@@ -27,6 +28,8 @@ export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler 
 
     // Recalculate the number of tokens on sale for each attribute
     for (const tokenAttribute of tokenAttributes) {
+      const startTimestamp = new Date().getTime();
+
       const { floorSell, onSaleCount } = await Tokens.getSellFloorValueAndOnSaleCount(
         tokenAttribute.collectionId,
         tokenAttribute.key,
@@ -45,6 +48,21 @@ export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler 
         onSaleCount,
         sellUpdatedAt: new Date().toISOString(),
       });
+
+      if (config.chainId === 1) {
+        logger.info(
+          this.queueName,
+          JSON.stringify({
+            topic: "debugCPU",
+            message: `Start. contract=${contract}, tokenId=${tokenId}, attributeId=${tokenAttribute.attributeId}`,
+            payload,
+            tokenAttribute,
+            token: `${contract}:${tokenId}`,
+            tokenAndAttribute: `${contract}:${tokenId}:${tokenAttribute.attributeId}`,
+            latencyMs: new Date().getTime() - startTimestamp,
+          })
+        );
+      }
     }
   }
 

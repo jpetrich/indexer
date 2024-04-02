@@ -12,6 +12,7 @@ import { metadataIndexFetchJob } from "@/jobs/metadata-index/metadata-fetch-job"
 import MetadataProviderRouter from "@/metadata/metadata-provider-router";
 import * as marketplaceFees from "@/utils/marketplace-fees";
 import * as royalties from "@/utils/royalties";
+import { isSharedContract } from "@/metadata/extend";
 
 export type FetchCollectionMetadataJobPayload = {
   contract: string;
@@ -185,7 +186,7 @@ export default class FetchCollectionMetadataJob extends AbstractRabbitMqJobHandl
       infos.map((info) => {
         if (jobId === "") {
           // For contracts with multiple collections, we have to include the token in order the fetch the right collection
-          jobId = getNetworkSettings().multiCollectionContracts.includes(info.contract)
+          jobId = isSharedContract(info.contract)
             ? `${info.contract}-${info.tokenId}`
             : info.contract;
         }
