@@ -9,7 +9,7 @@ import { redis } from "@/common/redis";
 import { regex } from "@/common/utils";
 import { config } from "@/config/index";
 import { tokenRefreshCacheJob } from "@/jobs/token-updates/token-refresh-cache-job";
-import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
+import { resyncTokenAttributesCacheJob } from "@/jobs/update-attribute/resync-token-attributes-cache-job";
 import { ApiKeyManager } from "@/models/api-keys";
 import { Collections } from "@/models/collections";
 import { PendingFlagStatusSyncTokens } from "@/models/pending-flag-status-sync-tokens";
@@ -170,7 +170,7 @@ export const postTokensRefreshV1Options: RouteOptions = {
       );
 
       // Revalidate the token attribute cache
-      await resyncAttributeCacheJob.addToQueue({ contract, tokenId }, 0, overrideCoolDown);
+      await resyncTokenAttributesCacheJob.addToQueue({ contract, tokenId }, 0, overrideCoolDown);
 
       logger.info(
         `post-tokens-refresh-${version}-handler`,

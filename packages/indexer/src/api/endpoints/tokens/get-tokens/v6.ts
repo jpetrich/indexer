@@ -37,7 +37,7 @@ import * as AsksIndex from "@/elasticsearch/indexes/asks";
 import { OrderComponents } from "@reservoir0x/sdk/dist/seaport-base/types";
 import { hasExtendCollectionHandler } from "@/metadata/extend";
 import { parseMetadata } from "@/api/endpoints/tokens/get-user-tokens/v8";
-import ResyncAttributeCacheJob from "@/jobs/update-attribute/resync-attribute-cache-job";
+import ResyncTokenAttributesCacheJob from "@/jobs/update-attribute/resync-token-attributes-cache-job";
 
 const version = "v6";
 
@@ -1585,7 +1585,7 @@ export const getTokensV6Options: RouteOptions = {
                       tokenCount: attribute.tokenCount,
                       onSaleCount: attribute.onSaleCount,
                       floorAskPrice:
-                        attribute.tokenCount > ResyncAttributeCacheJob.maxTokensPerAttribute
+                        attribute.tokenCount > ResyncTokenAttributesCacheJob.maxTokensPerAttribute
                           ? null
                           : attribute.floorAskPrice
                           ? formatEth(attribute.floorAskPrice)
@@ -2293,7 +2293,8 @@ export const getListedTokensFromES = async (query: any, attributeFloorAskPriceAs
                       tokenCount: attribute.tokenCount,
                       onSaleCount: attribute.onSaleCount,
                       floorAskPrice:
-                        attribute.tokenCount <= ResyncAttributeCacheJob.maxTokensPerAttribute &&
+                        attribute.tokenCount <=
+                          ResyncTokenAttributesCacheJob.maxTokensPerAttribute &&
                         attribute.floorAskValue
                           ? await getJoiPriceObject(
                               {

@@ -5,25 +5,25 @@ import { config } from "@/config/index";
 import _ from "lodash";
 import { logger } from "@/common/logger";
 
-export type ResyncAttributeCacheJobPayload = {
+export type ResyncTokenAttributesCacheJobPayload = {
   contract: string;
   tokenId: string;
 };
 
-export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler {
+export default class ResyncTokenAttributesCacheJob extends AbstractRabbitMqJobHandler {
   public static maxTokensPerAttribute = 15000;
 
-  queueName = "resync-attribute-cache-queue";
+  queueName = "resync-token-attributes-cache-queue";
   maxRetries = 10;
   concurrency = 3;
 
-  public async process(payload: ResyncAttributeCacheJobPayload) {
+  public async process(payload: ResyncTokenAttributesCacheJobPayload) {
     const { contract, tokenId } = payload;
 
     const tokenAttributes = await Tokens.getTokenAttributes(
       contract,
       tokenId,
-      ResyncAttributeCacheJob.maxTokensPerAttribute
+      ResyncTokenAttributesCacheJob.maxTokensPerAttribute
     );
 
     // Recalculate the number of tokens on sale for each attribute
@@ -67,7 +67,7 @@ export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler 
   }
 
   public async addToQueue(
-    params: ResyncAttributeCacheJobPayload,
+    params: ResyncTokenAttributesCacheJobPayload,
     delay = _.includes([1, 137], config.chainId) ? 60 * 10 * 1000 : 60 * 60 * 24 * 1000,
     forceRefresh = false
   ) {
@@ -77,4 +77,4 @@ export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler 
   }
 }
 
-export const resyncAttributeCacheJob = new ResyncAttributeCacheJob();
+export const resyncTokenAttributesCacheJob = new ResyncTokenAttributesCacheJob();
