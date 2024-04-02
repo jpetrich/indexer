@@ -36,7 +36,7 @@ import { Collections } from "@/models/collections";
 import { hasExtendCollectionHandler } from "@/metadata/extend";
 import { getListedTokensFromES } from "@/api/endpoints/tokens/get-tokens/v6";
 import { parseMetadata } from "@/api/endpoints/tokens/get-user-tokens/v8";
-import ResyncAttributeCacheJob from "@/jobs/update-attribute/resync-attribute-cache-job";
+import ResyncTokenAttributesCacheJob from "@/jobs/update-attribute/resync-token-attributes-cache-job";
 
 const version = "v7";
 
@@ -1643,7 +1643,8 @@ export const getTokensV7Options: RouteOptions = {
                         tokenCount: attribute.tokenCount,
                         onSaleCount: attribute.onSaleCount,
                         floorAskPrice:
-                          attribute.tokenCount <= ResyncAttributeCacheJob.maxTokensPerAttribute &&
+                          attribute.tokenCount <=
+                            ResyncTokenAttributesCacheJob.maxTokensPerAttribute &&
                           attribute.floorAskValue
                             ? await getJoiPriceObject(
                                 {

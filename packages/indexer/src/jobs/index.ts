@@ -58,7 +58,7 @@ import { tokenFloorQueueJob } from "@/jobs/token-updates/token-floor-queue-job";
 import { fetchCollectionMetadataJob } from "@/jobs/token-updates/fetch-collection-metadata-job";
 import { handleNewBuyOrderJob } from "@/jobs/update-attribute/handle-new-buy-order-job";
 import { handleNewSellOrderJob } from "@/jobs/update-attribute/handle-new-sell-order-job";
-import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
+import { resyncTokenAttributesCacheJob } from "@/jobs/update-attribute/resync-token-attributes-cache-job";
 import { resyncAttributeCollectionJob } from "@/jobs/update-attribute/resync-attribute-collection-job";
 import { resyncAttributeFloorSellJob } from "@/jobs/update-attribute/resync-attribute-floor-sell-job";
 import { resyncAttributeKeyCountsJob } from "@/jobs/update-attribute/resync-attribute-key-counts-job";
@@ -238,7 +238,7 @@ export class RabbitMqJobsConsumer {
       fetchCollectionMetadataJob,
       handleNewBuyOrderJob,
       handleNewSellOrderJob,
-      resyncAttributeCacheJob,
+      resyncTokenAttributesCacheJob,
       resyncAttributeCollectionJob,
       resyncAttributeFloorSellJob,
       resyncAttributeKeyCountsJob,
