@@ -2,6 +2,7 @@ import { AbstractRabbitMqJobHandler } from "@/jobs/abstract-rabbit-mq-job-handle
 import { Attributes } from "@/models/attributes";
 import { Tokens } from "@/models/tokens";
 import { logger } from "@/common/logger";
+import { config } from "@/config/index";
 
 export type ResyncAttributeCacheJobInfo = {
   attributeId: number;
@@ -34,14 +35,17 @@ export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler 
       sellUpdatedAt: new Date().toISOString(),
     });
 
-    logger.info(
-      this.queueName,
-      JSON.stringify({
-        topic: "debugCPU",
-        message: `Update. attributeId=${payload.attributeId}`,
-        payload,
-      })
-    );
+    if (config.chainId === 1) {
+      logger.info(
+        this.queueName,
+        JSON.stringify({
+          topic: "debugCPU",
+          message: `Updated Attribute. attributeId=${payload.attributeId}`,
+          payload,
+          attributeId: payload.attributeId,
+        })
+      );
+    }
   }
 
   public async addToQueue(

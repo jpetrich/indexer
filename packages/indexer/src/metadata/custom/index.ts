@@ -40,7 +40,7 @@ export const customFetchTokenUriMetadata = async (token: any, uri: string) =>
 
 // Yuga Labs
 customTokenURI["1,0xe012baf811cf9c05c408e879c399960d1f305903"] = yugaLabs;
-customTokenURI["11155111,0xafc1d694d3d2ea3e28e13c11bea9c9a14a1f55f6"] = yugaLabs;
+customTokenURI["1,0x60e4d786628fea6478f785a6d7e704777c86a7c6"] = yugaLabs;
 
 // Bridge to Base
 custom["8453,0xea2a41c02fa86a4901826615f9796e603c6a4491"] = bridgeToBase;
