@@ -588,6 +588,10 @@ export const getExecuteCancelV3Options: RouteOptions = {
 
                   return { steps };
                 }
+              } else {
+                steps[0].items.push({
+                  status: "complete",
+                });
               }
 
               for (const order of data.onchainCancellable) {

@@ -8,7 +8,6 @@ import { orderRevalidationsJob } from "@/jobs/order-fixes/order-revalidations-jo
 
 enum TransferSecurityLevel {
   Recommended,
-  Zero,
   One,
   Two,
   Three,
@@ -16,6 +15,7 @@ enum TransferSecurityLevel {
   Five,
   Six,
   Seven,
+  Eight,
 }
 
 export type ERC721CV2Config = {
@@ -302,12 +302,12 @@ function getListByConfig(config: ERC721CV2Config): {
 } {
   switch (config.transferSecurityLevel) {
     // No restrictions
-    case TransferSecurityLevel.Zero: {
+    case TransferSecurityLevel.One: {
       return {};
     }
 
     // Blacklist restrictions
-    case TransferSecurityLevel.One: {
+    case TransferSecurityLevel.Two: {
       return {
         blacklist: config.blacklist.accounts,
       };
@@ -325,16 +325,22 @@ function getListByConfig(config: ERC721CV2Config): {
 export const checkMarketplaceIsFiltered = async (contract: string, operators: string[]) => {
   const config = await getConfigFromDb(contract);
   if (!config) {
-    return false;
+    return { filtered: false, isV2: false };
   }
 
   const { whitelist, blacklist } = getListByConfig(config);
 
   if (whitelist) {
-    return whitelist.length ? operators.some((op) => !whitelist.includes(op)) : true;
+    return {
+      filtered: whitelist.length ? operators.some((op) => !whitelist.includes(op)) : true,
+      isV2: true,
+    };
   } else if (blacklist) {
-    return blacklist.length ? operators.some((op) => blacklist.includes(op)) : false;
+    return {
+      filtered: blacklist.length ? operators.some((op) => blacklist.includes(op)) : false,
+      isV2: true,
+    };
   } else {
-    return false;
+    return { filtered: false, isV2: true };
   }
 };
