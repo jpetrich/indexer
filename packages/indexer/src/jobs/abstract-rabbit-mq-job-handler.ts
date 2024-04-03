@@ -87,19 +87,19 @@ export abstract class AbstractRabbitMqJobHandler {
 
         processResult = await Promise.race([
           this.process(this.rabbitMqMessage.payload),
-          new Promise((resolve, reject) => {
-            timeout = setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    `job timed out ${
-                      this.getTimeout() / 1000
-                    }s ${this.getQueue()} with payload ${consumeMessage.content.toString()}`
-                  )
-                ),
-              this.getTimeout()
-            );
-          }),
+          // new Promise((resolve, reject) => {
+          //   timeout = setTimeout(
+          //     () =>
+          //       reject(
+          //         new Error(
+          //           `job timed out ${
+          //             this.getTimeout() / 1000
+          //           }s ${this.getQueue()} with payload ${consumeMessage.content.toString()}`
+          //         )
+          //       ),
+          //     this.getTimeout()
+          //   );
+          // }),
         ]);
 
         if (timeout) {
