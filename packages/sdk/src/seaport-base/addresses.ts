@@ -140,7 +140,7 @@ export const OpenSeaProtectedOffersZone: ChainIdToAddress = {
   [Network.Mumbai]: "0x000000e7ec00e7b300774b00001314b8610022b8",
 };
 
-export const OpenSeaV16ProtectedOffersZone: ChainIdToAddress = {
+export const OpenSeaV16SignedZone: ChainIdToAddress = {
   [Network.Ethereum]: "0x000056f7000000ece9003ca63978907a00ffd100",
   [Network.EthereumGoerli]: "0x000056f7000000ece9003ca63978907a00ffd100",
   [Network.EthereumSepolia]: "0x000056f7000000ece9003ca63978907a00ffd100",
