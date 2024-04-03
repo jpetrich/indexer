@@ -208,6 +208,8 @@ export const save = async (
             AddressZero,
             // Reservoir cancellation zone
             Sdk.SeaportBase.Addresses.ReservoirV16CancellationZone[config.chainId],
+            // Okx cancellation zone
+            Sdk.SeaportBase.Addresses.OkxV16CancellationZone[config.chainId],
           ].includes(order.params.zone) &&
           // OS signed zone
           !usesOSZone
@@ -229,15 +231,15 @@ export const save = async (
         });
       }
 
-      // if (
-      //   order.params.zone === Sdk.SeaportBase.Addresses.OkxCancellationZone[config.chainId] &&
-      //   !isOkx
-      // ) {
-      //   return results.push({
-      //     id,
-      //     status: "unsupported-zone",
-      //   });
-      // }
+      if (
+        order.params.zone === Sdk.SeaportBase.Addresses.OkxV16CancellationZone[config.chainId] &&
+        !isOkx
+      ) {
+        return results.push({
+          id,
+          status: "unsupported-zone",
+        });
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (isOkx && !(orderParams as any).okxOrderId) {
