@@ -1,9 +1,7 @@
 import { AbstractRabbitMqJobHandler } from "@/jobs/abstract-rabbit-mq-job-handler";
 import { Tokens } from "@/models/tokens";
-import { config } from "@/config/index";
 
 import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
-import { logger } from "@/common/logger";
 
 export type ResyncTokenAttributesCacheJobPayload = {
   contract: string;
@@ -26,20 +24,6 @@ export default class ResyncTokenAttributesCacheJob extends AbstractRabbitMqJobHa
       tokenId,
       ResyncTokenAttributesCacheJob.maxTokensPerAttribute
     );
-
-    if (config.chainId === 1) {
-      for (const tokenAttribute of tokenAttributes) {
-        logger.info(
-          this.queueName,
-          JSON.stringify({
-            topic: "debugCPU",
-            message: `Processing Token Attribute. attributeId=${tokenAttribute.attributeId}`,
-            payload,
-            attributeId: tokenAttribute.attributeId,
-          })
-        );
-      }
-    }
 
     // Recalculate the number of tokens on sale for each attribute
     await resyncAttributeCacheJob.addToQueue(

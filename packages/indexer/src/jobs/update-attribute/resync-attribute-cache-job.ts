@@ -12,7 +12,7 @@ export type ResyncAttributeCacheJobInfo = {
 export default class ResyncAttributeCacheJob extends AbstractRabbitMqJobHandler {
   queueName = "resync-attribute-cache-queue";
   maxRetries = 10;
-  concurrency = 1;
+  concurrency = 3;
 
   public async process(payload: ResyncAttributeCacheJobInfo) {
     const attribute = await Attributes.getById(payload.attributeId);
