@@ -195,6 +195,7 @@ import { recalcOnSaleCountQueueJob } from "@/jobs/collection-updates/recalc-on-s
 import { burnedTokenJob } from "@/jobs/token-updates/burned-token-job";
 import { publishEventToKafkaStreamJob } from "@/jobs/websocket-events/publish-event-to-kafka-stream-job";
 import { backfillInvalidatedPPV2OrdersJob } from "@/jobs/backfill/backfill-invalidated-ppv2-orders";
+import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
 
 export const allJobQueues = [
   backfillWrongNftBalances.queue,
@@ -228,6 +229,7 @@ export class RabbitMqJobsConsumer {
    */
   public static getQueues(): AbstractRabbitMqJobHandler[] {
     return [
+      resyncAttributeCacheJob,
       tokenReclacSupplyJob,
       tokenRefreshCacheJob,
       recalcOwnerCountQueueJob,
