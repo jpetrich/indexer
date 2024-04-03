@@ -2119,8 +2119,9 @@ export const getExecuteBuyV7Options: RouteOptions = {
       await Promise.all(
         listingDetails.map(async (d) => {
           try {
-            const configV1 = await erc721c.v1.getConfig(d.contract);
-            const configV2 = await erc721c.v2.getConfig(d.contract);
+            const configV1 = await erc721c.v1.getConfigFromDb(d.contract);
+            const configV2 = await erc721c.v2.getConfigFromDb(d.contract);
+
             if (
               (configV1 && [4, 6].includes(configV1.transferSecurityLevel)) ||
               (configV2 && [6, 8].includes(configV2.transferSecurityLevel))

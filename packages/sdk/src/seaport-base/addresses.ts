@@ -215,6 +215,17 @@ export const OkxCancellationZone: ChainIdToAddress = {
   [Network.PolygonZkevm]: "0x10a8c9065692dffd48df1935e67a2744667fd9d0",
 };
 
+export const OkxV16CancellationZone: ChainIdToAddress = {
+  [Network.Ethereum]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Optimism]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Bsc]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Polygon]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Base]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Arbitrum]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.ArbitrumNova]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+  [Network.Avalanche]: "0xdf2d4bffec010debd302674c9fb9cda99bb5e852",
+};
+
 export const ImmutableProtectedZone: ChainIdToAddress = {
   [Network.ImmutableZkevmTestnet]: "0x63441cbfbd15dd8f5e92598e535661ac5acb808e",
 };
