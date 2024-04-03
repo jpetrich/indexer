@@ -41,6 +41,7 @@ export type OrderInfo = {
   isReservoir?: boolean;
   isOpenSea?: boolean;
   openSeaOrderParams?: OpenseaOrderParams;
+  isOkx?: boolean;
 };
 
 type SaveResult = {
@@ -64,7 +65,8 @@ export const save = async (
     metadata: OrderMetadata,
     isReservoir?: boolean,
     isOpenSea?: boolean,
-    openSeaOrderParams?: OpenseaOrderParams
+    openSeaOrderParams?: OpenseaOrderParams,
+    isOkx?: boolean
   ) => {
     try {
       const order = new Sdk.SeaportV16.Order(config.chainId, orderParams);
@@ -141,7 +143,7 @@ export const save = async (
           [
             {
               kind: "seaport-v1.6",
-              info: { orderParams, metadata, isReservoir, isOpenSea, openSeaOrderParams },
+              info: { orderParams, metadata, isReservoir, isOpenSea, openSeaOrderParams, isOkx },
               validateBidValue,
               ingestMethod,
               ingestDelay: startTime - currentTime + 5,
@@ -227,13 +229,31 @@ export const save = async (
         });
       }
 
+      // if (
+      //   order.params.zone === Sdk.SeaportBase.Addresses.OkxCancellationZone[config.chainId] &&
+      //   !isOkx
+      // ) {
+      //   return results.push({
+      //     id,
+      //     status: "unsupported-zone",
+      //   });
+      // }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (isOkx && !(orderParams as any).okxOrderId) {
+        return results.push({
+          id,
+          status: "missing-okx-order-id",
+        });
+      }
+
       // Make sure no zero signatures are allowed
       if (order.params.signature && /^0x0+$/g.test(order.params.signature)) {
         order.params.signature = undefined;
       }
 
       // Check: order has a valid signature
-      if (metadata.fromOnChain || (isOpenSea && !order.params.signature)) {
+      if (metadata.fromOnChain || ((isOpenSea || isOkx) && !order.params.signature)) {
         // Skip if:
         // - the order was validated on-chain
         // - the order is coming from OpenSea / Okx and it doesn't have a signature
@@ -590,6 +610,8 @@ export const save = async (
 
       if (isOpenSea) {
         source = await sources.getOrInsert("opensea.io");
+      } else if (isOkx) {
+        source = await sources.getOrInsert("okx.com");
       }
 
       // If the order is native, override any default source
@@ -730,6 +752,11 @@ export const save = async (
         (order.params as any).partial = true;
       }
 
+      if (isOkx) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (order.params as any).okxOrderId = (orderParams as any).okxOrderId;
+      }
+
       // Handle: off-chain cancellation via replacement
       if (
         order.params.zone === Sdk.SeaportBase.Addresses.ReservoirV16CancellationZone[config.chainId]
@@ -845,7 +872,8 @@ export const save = async (
           orderInfo.metadata,
           orderInfo.isReservoir,
           orderInfo.isOpenSea,
-          orderInfo.openSeaOrderParams
+          orderInfo.openSeaOrderParams,
+          orderInfo.isOkx
         )
       )
     )
