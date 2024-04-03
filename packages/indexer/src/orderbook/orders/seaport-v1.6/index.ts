@@ -194,9 +194,9 @@ export const save = async (
         });
       }
 
-      const isProtectedOffer =
-        Sdk.SeaportBase.Addresses.OpenSeaV16ProtectedOffersZone[config.chainId] ===
-          order.params.zone && info.side === "buy";
+      const usesOSZone =
+        Sdk.SeaportBase.Addresses.OpenSeaV16SignedZone[config.chainId] === order.params.zone &&
+        isOpenSea;
 
       // Check: order has a known zone
       if (order.params.orderType > 1) {
@@ -207,8 +207,8 @@ export const save = async (
             // Reservoir cancellation zone
             Sdk.SeaportBase.Addresses.ReservoirV16CancellationZone[config.chainId],
           ].includes(order.params.zone) &&
-          // Protected offers zone
-          !isProtectedOffer
+          // OS signed zone
+          !usesOSZone
         ) {
           return results.push({
             id,

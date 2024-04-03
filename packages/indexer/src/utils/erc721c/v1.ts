@@ -242,12 +242,15 @@ export const refreshPermittedContractReceiverAllowlist = async (
 export const checkMarketplaceIsFiltered = async (contract: string, operators: string[]) => {
   const config = await getConfigFromDb(contract);
   if (!config) {
-    return false;
+    return { filtered: false, isV1: false };
   }
 
   if (!config.operatorWhitelist.length) {
-    return false;
+    return { filtered: false, isV1: true };
   }
 
-  return !operators.every((op) => config.operatorWhitelist.includes(op));
+  return {
+    filtered: !operators.every((op) => config.operatorWhitelist.includes(op)),
+    isV1: true,
+  };
 };
