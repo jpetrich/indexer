@@ -1,7 +1,6 @@
 import { AbstractRabbitMqJobHandler } from "@/jobs/abstract-rabbit-mq-job-handler";
 import { Tokens } from "@/models/tokens";
 import { config } from "@/config/index";
-import _ from "lodash";
 
 import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
 import { logger } from "@/common/logger";
@@ -52,7 +51,7 @@ export default class ResyncTokenAttributesCacheJob extends AbstractRabbitMqJobHa
 
   public async addToQueue(
     params: ResyncTokenAttributesCacheJobPayload,
-    delay = _.includes([1, 137], config.chainId) ? 60 * 10 * 1000 : 60 * 60 * 24 * 1000,
+    delay = 60 * 1000,
     forceRefresh = false
   ) {
     const token = `${params.contract}:${params.tokenId}`;
