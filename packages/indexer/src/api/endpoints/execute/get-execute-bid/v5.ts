@@ -645,6 +645,11 @@ export const getExecuteBidV5Options: RouteOptions = {
           if (params.orderKind === "seaport-v1.4") {
             params.orderKind = "seaport-v1.5";
           }
+
+          if (params.orderbook === "opensea" && params.orderKind === "seaport-v1.5") {
+            params.orderKind = "seaport-v1.6";
+          }
+
           // Force usage of looks-rare-v2
           if (params.orderKind === "looks-rare") {
             params.orderKind = "looks-rare-v2";
