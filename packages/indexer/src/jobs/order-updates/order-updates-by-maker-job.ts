@@ -183,7 +183,9 @@ export default class OrderUpdatesByMakerJob extends AbstractRabbitMqJobHandler {
             // Some orders should never get revalidated
             .map((data) =>
               data.new_status === "no-balance" &&
-              ["opensea.io", "x2y2.io"].includes(sources.get(data.source_id_int)?.domain ?? "")
+              ["mintify.xyz", "opensea.io", "x2y2.io"].includes(
+                sources.get(data.source_id_int)?.domain ?? ""
+              )
                 ? { ...data, new_status: "cancelled" }
                 : data
             )
@@ -320,7 +322,7 @@ export default class OrderUpdatesByMakerJob extends AbstractRabbitMqJobHandler {
                   // Some orders should never get revalidated
                   ({ source_id_int, approval_status }) =>
                     approval_status === "no-approval" &&
-                    ["x2y2.io"].includes(sources.get(source_id_int)?.domain ?? "")
+                    ["x2y2.io", "mintify.xyz"].includes(sources.get(source_id_int)?.domain ?? "")
                 )
                 .map(({ id, expiration }) => ({
                   id,
@@ -456,16 +458,13 @@ export default class OrderUpdatesByMakerJob extends AbstractRabbitMqJobHandler {
             .filter(({ new_status, kind }) =>
               ["sudoswap", "sudoswap-v2", "nftx"].includes(kind) ? new_status !== "fillable" : true
             )
-            // Do not revalidate cosigned orders
-            .filter(({ seaport_zone, pp_cosigner, new_status }) =>
-              isCosignedOrder(seaport_zone, pp_cosigner) ? new_status !== "fillable" : true
-            )
             // Some orders should never get revalidated
             .map((data) =>
               data.new_status === "no-balance" &&
-              ["blur.io", "x2y2.io", "opensea.io"].includes(
+              (["blur.io", "x2y2.io", "opensea.io"].includes(
                 sources.get(data.source_id_int)?.domain ?? ""
-              )
+              ) ||
+                isCosignedOrder(data.seaport_zone, data.pp_cosigner))
                 ? { ...data, new_status: "cancelled" }
                 : data
             )
@@ -559,10 +558,6 @@ export default class OrderUpdatesByMakerJob extends AbstractRabbitMqJobHandler {
             // TODO: Is the below filtering needed anymore?
             // Exclude escrowed orders
             .filter(({ kind }) => kind !== "foundation" && kind !== "cryptopunks")
-            // Do not revalidate cosigned orders
-            .filter(({ seaport_zone, pp_cosigner, new_status }) =>
-              isCosignedOrder(seaport_zone, pp_cosigner) ? new_status !== "fillable" : true
-            )
             .map(({ id, new_status, expiration }) => ({
               id,
               approval_status: new_status,
@@ -593,9 +588,10 @@ export default class OrderUpdatesByMakerJob extends AbstractRabbitMqJobHandler {
           const cancelledValues = approvalStatuses
             .filter(
               // Some orders should never get revalidated
-              ({ source_id_int, new_status }) =>
+              ({ source_id_int, seaport_zone, pp_cosigner, new_status }) =>
                 new_status === "no-approval" &&
-                ["blur.io", "x2y2.io"].includes(sources.get(source_id_int)?.domain ?? "")
+                (["blur.io", "x2y2.io"].includes(sources.get(source_id_int)?.domain ?? "") ||
+                  isCosignedOrder(seaport_zone, pp_cosigner))
             )
             .map(({ id, expiration }) => ({
               id,

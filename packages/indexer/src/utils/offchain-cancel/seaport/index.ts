@@ -178,12 +178,22 @@ export const doReplacement = async ({ replacedOrders, newOrders, orderKind }: Re
 
 export const doSignOrder = async (order: Order, taker: string, matchParams: MatchParams) => {
   if (order.isCosignedOrder()) {
+    const orderId = order.hash();
+
     const isOffChainCancelled = await idb.oneOrNone(
       `SELECT 1 FROM off_chain_cancellations WHERE order_id = $/orderId/`,
-      { orderId: order.hash() }
+      { orderId }
     );
     if (isOffChainCancelled) {
       throw new Error("Order is off-chain cancelled");
+    }
+
+    const isFillable = await idb.oneOrNone(
+      `SELECT 1 FROM orders WHERE id = $/orderId/ AND orders.fillability_status = 'fillable' AND orders.approval_status = 'approved'`,
+      { orderId }
+    );
+    if (!isFillable) {
+      throw new Error("Order is not fillable");
     }
 
     const features = new Features(order.params.zoneHash);
