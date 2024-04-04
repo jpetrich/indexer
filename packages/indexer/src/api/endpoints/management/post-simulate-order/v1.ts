@@ -277,6 +277,8 @@ export const postSimulateOrderV1Options: RouteOptions = {
         "0x2187093a2736442d0b5c5d5464b98fc703e3b88d:1",
         // Potatoz
         "0x39ee2c7b3cb80254225884ca001f57118c8f21b6:1",
+        // The Plague
+        "0xc379e535caff250a01caa6c3724ed1359fe5c29b:1",
         // y00ts
         "0x670fd103b1a08628e9557cd66b87ded841115190:137",
       ];
