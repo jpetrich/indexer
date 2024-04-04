@@ -157,6 +157,7 @@ export enum Network {
   BlastSepolia = 168587773,
   ApexTestnet = 70800,
   RedstoneTestnet = 17001,
+  BerachainTestnet = 80085,
 }
 
 export type ChainIdToAddress = { [chainId: number]: string };

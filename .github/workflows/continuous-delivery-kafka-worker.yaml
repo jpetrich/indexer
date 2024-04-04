@@ -239,6 +239,9 @@ jobs:
 
           ./utils/version_update_batch.sh indexer-redstone-testnet ${{ github.sha }} \
             ./prod/platform/indexer-kafka-worker-redstone-testnet.yaml
+          
+          ./utils/version_update_batch.sh indexer-berachain-testnet ${{ github.sha }} \
+            ./prod/platform/indexer-kafka-worker-berachain-testnet.yaml
 
       - name: Post to Slack
         if: ${{ always() }}

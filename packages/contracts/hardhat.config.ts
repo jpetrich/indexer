@@ -107,6 +107,9 @@ const getNetworkConfig = (chainId?: number) => {
       case 17001:
         url = "https://rpc.holesky.redstone.xyz";
         break;
+      case 80085:
+        url = "https://artio.rpc.berachain.com";
+        break;
       default:
         throw new Error("Unsupported chain id");
     }
@@ -195,6 +198,7 @@ const config: HardhatUserConfig = {
     blastSepolia: getNetworkConfig(168587773),
     apexTestnet: getNetworkConfig(70800),
     redstoneTestnet: getNetworkConfig(17001),
+    berachainTestnet: getNetworkConfig(80085),
   },
   etherscan: {
     apiKey: {
@@ -228,6 +232,7 @@ const config: HardhatUserConfig = {
       blastSepolia: process.env.ETHERSCAN_API_KEY_BLAST ?? "",
       apexTestnet: "0x",
       redstoneTestnet: "0x",
+      berachainTestnet: "0x",
     },
     customChains: [
       // Mainnets
@@ -398,6 +403,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://17001-explorer-api.quarry.linfra.xyz/api",
           browserURL: "https://explorer.holesky.redstone.xyz/",
+        },
+      },
+      {
+        network: "berachainTestnet",
+        chainId: 80085,
+        urls: {
+          apiURL: "https://api.routescan.io/v2/network/testnet/evm/80085/",
+          browserURL: "https://artio.beratrail.io/",
         },
       },
     ],
