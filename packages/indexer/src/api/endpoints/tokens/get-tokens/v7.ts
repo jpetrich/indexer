@@ -599,6 +599,9 @@ export const getTokensV7Options: RouteOptions = {
       }
     }
 
+    let collectionFloorAskQuery = "";
+    let selectCollectionFloorAsk = "";
+
     let sourceCte = "";
     if (query.nativeSource || query.excludeEOA) {
       const sourceConditions: string[] = [];
@@ -717,6 +720,18 @@ export const getTokensV7Options: RouteOptions = {
             query.normalizeRoyalties ? "o.normalized_value" : "o.value"
           }
         )`;
+    } else {
+      collectionFloorAskQuery = ", o.*";
+      selectCollectionFloorAsk = `
+          LEFT JOIN LATERAL (
+            SELECT
+              orders.currency
+            FROM orders
+            WHERE orders.id = c.${
+              query.normalizeRoyalties ? "normalized_floor_sell_id" : "floor_sell_id"
+            }
+          ) o ON TRUE
+      `;
     }
 
     let collectionFloorAskSelectQuery;
@@ -794,6 +809,7 @@ export const getTokensV7Options: RouteOptions = {
           ${selectIncludeDynamicPricing}
           ${selectRoyaltyBreakdown}
           ${mintStagesSelectQuery}
+          ${collectionFloorAskQuery}
         FROM tokens t
         ${
           sourceCte !== ""
@@ -810,6 +826,7 @@ export const getTokensV7Options: RouteOptions = {
           query.excludeSpam ? `AND (c.is_spam IS NULL OR c.is_spam <= 0)` : ""
         }${query.excludeNsfw ? ` AND (c.nsfw_status IS NULL OR c.nsfw_status <= 0)` : ""}
         JOIN contracts con ON t.contract = con.address
+        ${selectCollectionFloorAsk}
       `;
 
       if (query.tokenSetId) {

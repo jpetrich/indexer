@@ -204,5 +204,5 @@ export const config = {
 
   disabledDatadogPluginsTracing: process.env.DISABLED_DATADOG_PLUGINS_TRACING
     ? String(process.env.DISABLED_DATADOG_PLUGINS_TRACING).split(",")
-    : ["ioredis", "amqplib", "pg", "elasticsearch", "fetch"],
+    : "ioredis,amqplib,pg,fetch".split(","),
 };
