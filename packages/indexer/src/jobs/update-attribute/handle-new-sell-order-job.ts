@@ -3,6 +3,7 @@ import { Attributes } from "@/models/attributes";
 import { Tokens } from "@/models/tokens";
 import _ from "lodash";
 import { resyncTokenAttributesCacheJob } from "@/jobs/update-attribute/resync-token-attributes-cache-job";
+import { resyncAttributeCacheJob } from "@/jobs/update-attribute/resync-attribute-cache-job";
 
 export type HandleNewSellOrderJobPayload = {
   contract: string;
@@ -55,10 +56,7 @@ export default class HandleNewSellOrderJob extends AbstractRabbitMqJobHandler {
           _.isNull(tokenAttribute.floorSellValue) ||
           Number(price) < Number(tokenAttribute.floorSellValue)
         ) {
-          await Attributes.update(tokenAttribute.attributeId, {
-            floorSellValue: price,
-            sellUpdatedAt: new Date().toISOString(),
-          });
+          await resyncAttributeCacheJob.addToQueue([{ attributeId: tokenAttribute.attributeId }]);
         }
       }
     }

@@ -201,4 +201,8 @@ export const config = {
   forceIpfsGateway: Boolean(Number(process.env.FORCE_IPFS_GATEWAY)),
 
   yugalabsMetadataApiUserAgent: String(process.env.YUGALABS_METADATA_API_USER_AGENT || ""),
+
+  disabledDatadogPluginsTracing: process.env.DISABLED_DATADOG_PLUGINS_TRACING
+    ? String(process.env.DISABLED_DATADOG_PLUGINS_TRACING).split(",")
+    : ["ioredis", "amqplib", "pg", "elasticsearch", "fetch"],
 };
