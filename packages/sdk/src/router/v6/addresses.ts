@@ -33,6 +33,7 @@ export const Router: ChainIdToAddress = {
   [Network.AstarZkevm]: "0x1aed60a97192157fda7fb26267a439d523d09c5e",
   [Network.ApexTestnet]: "0x1aed60a97192157fda7fb26267a439d523d09c5e",
   [Network.RedstoneTestnet]: "0x1aed60a97192157fda7fb26267a439d523d09c5e",
+  [Network.BerachainTestnet]: "0x1aed60a97192157fda7fb26267a439d523d09c5e",
 };
 
 // Approval proxy
@@ -66,6 +67,7 @@ export const ApprovalProxy: ChainIdToAddress = {
   [Network.AstarZkevm]: "0x224ecb4eae96d31372d1090c3b0233c8310dbbab",
   [Network.ApexTestnet]: "0x224ecb4eae96d31372d1090c3b0233c8310dbbab",
   [Network.RedstoneTestnet]: "0x224ecb4eae96d31372d1090c3b0233c8310dbbab",
+  [Network.BerachainTestnet]: "0x224ecb4eae96d31372d1090c3b0233c8310dbbab",
 };
 
 // Permit proxy
@@ -131,6 +133,7 @@ export const MintModule: ChainIdToAddress = {
   [Network.AstarZkevm]: "0xe3de16f7ed5a124686cc27571898e394959e8b39",
   [Network.ApexTestnet]: "0xe3de16f7ed5a124686cc27571898e394959e8b39",
   [Network.RedstoneTestnet]: "0xe3de16f7ed5a124686cc27571898e394959e8b39",
+  [Network.BerachainTestnet]: "0xe3de16f7ed5a124686cc27571898e394959e8b39",
 };
 
 export const DittoModule: ChainIdToAddress = {

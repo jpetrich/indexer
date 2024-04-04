@@ -304,6 +304,11 @@ jobs:
             ./prod/platform/indexer-api-redstone-testnet.yaml \
             ./prod/platform/indexer-worker-redstone-testnet.yaml \
             ./prod/platform/indexer-worker-master-redstone-testnet.yaml
+          
+          ./utils/version_update_batch.sh indexer-berachain-testnet ${{ github.sha }} \
+            ./prod/platform/indexer-api-berachain-testnet.yaml \
+            ./prod/platform/indexer-worker-berachain-testnet.yaml \
+            ./prod/platform/indexer-worker-master-berachain-testnet.yaml
 
       - name: Post to Slack
         if: ${{ always() }}
