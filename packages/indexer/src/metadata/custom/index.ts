@@ -6,6 +6,7 @@ import * as yugaLabs from "./yuga-labs";
 import * as bridgeToBase from "./bridge-to-base";
 import * as mintTest from "./mint-test";
 import * as azuki from "./azuki";
+import * as nftBadge from "./nft-badge";
 
 const customCollection: { [key: string]: any } = {};
 const custom: { [key: string]: any } = {};
@@ -38,15 +39,23 @@ export const customFetchTokenUriMetadata = async (token: any, uri: string) =>
 // Custom Tokens
 ////////////////
 
-// Yuga Labs
-customTokenURI["1,0xe012baf811cf9c05c408e879c399960d1f305903"] = yugaLabs;
-customTokenURI["1,0x60e4d786628fea6478f785a6d7e704777c86a7c6"] = yugaLabs;
-
 // Bridge to Base
 custom["8453,0xea2a41c02fa86a4901826615f9796e603c6a4491"] = bridgeToBase;
 
 // Mint test
 custom["999,0xe6a65c982ffa589a934fa93ab59e6e9646f25763"] = mintTest;
+
+// NFT Badge
+custom["11155111,0xea9af8dbdde2a8d3515c3b4e446ecd41afedb1c6"] = nftBadge;
+custom["59144,0x7136abb0fa3d88e4b4d4ee58fc1dfb8506bb7de7"] = nftBadge;
+
+////////////////
+// Custom Tokens URI
+////////////////
+
+// Yuga Labs
+customTokenURI["1,0xe012baf811cf9c05c408e879c399960d1f305903"] = yugaLabs;
+customTokenURI["1,0x60e4d786628fea6478f785a6d7e704777c86a7c6"] = yugaLabs;
 
 // Azuki
 customTokenURI["137,0xc1c2144b3e4e22f4205545e965f52ebc77a1c952"] = azuki;
