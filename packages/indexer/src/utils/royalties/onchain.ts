@@ -6,7 +6,7 @@ import _ from "lodash";
 
 import { idb } from "@/common/db";
 import { logger } from "@/common/logger";
-import { baseProvider, metadataIndexingBaseProvider } from "@/common/provider";
+import { baseProvider } from "@/common/provider";
 import { redis } from "@/common/redis";
 import { bn, fromBuffer } from "@/common/utils";
 import { config } from "@/config/index";
@@ -113,7 +113,7 @@ const internalGetOnChainRoyalties = async (token: string, tokenId: string, spec:
           )
         `,
       ]),
-      metadataIndexingBaseProvider
+      baseProvider
     );
 
     try {
@@ -187,7 +187,7 @@ export const getOnChainRoyalties = async (contract: string, tokenId: string, spe
 
   if (!result) {
     result = await internalGetOnChainRoyalties(contract, tokenId, spec);
-    await redis.set(cacheKey, JSON.stringify(result), "EX", 5 * 60);
+    await redis.set(cacheKey, JSON.stringify(result), "EX", 60 * 60);
   }
 
   return result;
