@@ -454,10 +454,11 @@ export const getExecuteSellV7Options: RouteOptions = {
                 source: source || undefined,
                 fees: additionalFees,
                 builtInFeeBps: builtInFees.map(({ bps }) => bps).reduce((a, b) => a + b, 0),
-                isProtected:
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (order.rawData as any).zone ===
+                isProtected: [
                   Sdk.SeaportBase.Addresses.OpenSeaProtectedOffersZone[config.chainId],
+                  Sdk.SeaportBase.Addresses.OpenSeaV16SignedZone[config.chainId],
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ].includes((order.rawData as any).zone),
               },
               {
                 kind: token.kind,

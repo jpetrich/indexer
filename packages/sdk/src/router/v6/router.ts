@@ -4567,7 +4567,7 @@ export class Router {
 
       const fees = getFees(detail);
 
-      if (detail.kind !== "seaport-v1.5-partial") {
+      if (detail.kind !== "seaport-v1.5-partial" && detail.kind !== "seaport-v1.6-partial") {
         addRouterTags(detail.kind, 1, fees.length);
       }
 
