@@ -937,13 +937,19 @@ export class Router {
               details[i] = {
                 ...detail,
                 kind: "seaport-v1.5",
-                order: new Sdk.SeaportV15.Order(this.chainId, result.data.order),
+                order: new Sdk.SeaportV15.Order(this.chainId, {
+                  ...result.data.order,
+                  extraData: result.data.extraData,
+                }),
               };
             } else {
               details[i] = {
                 ...detail,
                 kind: "seaport-v1.6",
-                order: new Sdk.SeaportV16.Order(this.chainId, result.data.order),
+                order: new Sdk.SeaportV16.Order(this.chainId, {
+                  ...result.data.order,
+                  extraData: result.data.extraData,
+                }),
               };
             }
           } catch (error) {
