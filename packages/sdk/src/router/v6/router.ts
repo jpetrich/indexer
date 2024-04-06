@@ -5309,6 +5309,13 @@ export class Router {
           const tokenId = detail.tokenId;
           order.params.specificIds = [tokenId];
 
+          // TODO: We should be able to fill multiple `specificIds` via the same order
+          // and this way we can also use the ZeroEx module for accurate pricing data,
+          // rather than using the below ugly price adjustment hack.
+
+          // The detail will contain the price to use for the order (we adjust it down to avoid precision issues)
+          order.params.price = bn(detail.price).mul(99).div(100).toString();
+
           // Cover the case where the path is missing
           order.params.path = order.params.path.length
             ? order.params.path

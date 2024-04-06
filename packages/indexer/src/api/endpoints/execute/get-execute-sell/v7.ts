@@ -870,7 +870,11 @@ export const getExecuteSellV7Options: RouteOptions = {
             const currency = fromBuffer(result.currency);
 
             // Account for the already filled maker's balance (not needed for Blur orders)
-            if (result.kind !== "blur") {
+            if (
+              !["blur", "sudoswap", "sudoswap-v2", "nftx", "nftx-v3", "caviar-v1"].includes(
+                result.kind
+              )
+            ) {
               const key = getMakerBalancesKey(maker, currency);
               if (makerBalances[key]) {
                 const makerAvailableQuantity = makerBalances[key].div(result.price).toNumber();
