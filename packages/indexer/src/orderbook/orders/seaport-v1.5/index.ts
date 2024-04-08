@@ -32,6 +32,7 @@ import * as tokenSet from "@/orderbook/token-sets";
 import { getCurrency } from "@/utils/currencies";
 import { checkMarketplaceIsFiltered } from "@/utils/marketplace-blacklists";
 import * as offchainCancel from "@/utils/offchain-cancel";
+import { validateOrderbookFee } from "@/utils/orderbook-fee";
 import { getUSDAndNativePrices } from "@/utils/prices";
 import * as royalties from "@/utils/royalties";
 import { isOpen } from "@/utils/seaport-conduits";
@@ -579,6 +580,9 @@ export const save = async (
           status: "fees-too-high",
         });
       }
+
+      // Validate the potential inclusion of an orderbook fee
+      await validateOrderbookFee("payment-processor-v2", feeBreakdown);
 
       // Handle: royalties on top
       const defaultRoyalties =

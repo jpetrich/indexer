@@ -18,6 +18,7 @@ import { DbOrder, OrderMetadata, generateSchemaHash } from "@/orderbook/orders/u
 import * as tokenSet from "@/orderbook/token-sets";
 import * as erc721c from "@/utils/erc721c";
 import { checkMarketplaceIsFiltered } from "@/utils/marketplace-blacklists";
+import { validateOrderbookFee } from "@/utils/orderbook-fee";
 import * as paymentProcessorV2 from "@/utils/payment-processor-v2";
 import { getUSDAndNativePrices } from "@/utils/prices";
 import { cosigner, saveOffChainCancellations } from "@/utils/offchain-cancel";
@@ -347,6 +348,9 @@ export const save = async (orderInfos: OrderInfo[]): Promise<SaveResult[]> => {
           bps: Number(order.params.marketplaceFeeNumerator),
         });
       }
+
+      // Validate the potential inclusion of an orderbook fee
+      await validateOrderbookFee("payment-processor-v2", feeBreakdown);
 
       const feeBps = feeBreakdown.map(({ bps }) => bps).reduce((a, b) => Number(a) + Number(b), 0);
 
