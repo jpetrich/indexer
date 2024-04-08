@@ -16,7 +16,7 @@ export type EventsSyncRealtimeJobPayload = {
 export class EventsSyncRealtimeJob extends AbstractRabbitMqJobHandler {
   queueName = "events-sync-realtime";
   maxRetries = 30;
-  concurrency = config.chainId === 7777777 ? 1 : 5;
+  concurrency = 5;
   timeout = 5 * 60 * 1000;
   backoff = {
     type: "fixed",
