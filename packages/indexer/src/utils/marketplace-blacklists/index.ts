@@ -45,14 +45,9 @@ export const checkMarketplaceIsFiltered = async (
     return customCheck;
   }
 
-  const erc721cV2Check = await erc721c.v2.checkMarketplaceIsFiltered(contract, operators);
-  if (erc721cV2Check.isV2) {
-    return erc721cV2Check.filtered;
-  }
-
-  const erc721cCheck = await erc721c.v1.checkMarketplaceIsFiltered(contract, operators);
-  if (erc721cCheck.isV1) {
-    return erc721cCheck.filtered;
+  const erc721cCheck = await erc721c.checkMarketplaceIsFiltered(contract, operators);
+  if (erc721cCheck) {
+    return erc721cCheck;
   }
 
   return operators.some((c) => result!.includes(c));

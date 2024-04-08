@@ -15,7 +15,7 @@ export type ERC721CConfig = {
   permittedContractReceiverAllowlist: string[];
 };
 
-export const getConfig = async (contract: string): Promise<ERC721CConfig | undefined> => {
+const getConfig = async (contract: string): Promise<ERC721CConfig | undefined> => {
   try {
     const token = new Contract(
       contract,
@@ -242,15 +242,12 @@ export const refreshPermittedContractReceiverAllowlist = async (
 export const checkMarketplaceIsFiltered = async (contract: string, operators: string[]) => {
   const config = await getConfigFromDb(contract);
   if (!config) {
-    return { filtered: false, isV1: false };
+    throw new Error("Missing config");
   }
 
   if (!config.operatorWhitelist.length) {
-    return { filtered: false, isV1: true };
+    return false;
   }
 
-  return {
-    filtered: !operators.every((op) => config.operatorWhitelist.includes(op)),
-    isV1: true,
-  };
+  return !operators.every((op) => config.operatorWhitelist.includes(op));
 };

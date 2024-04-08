@@ -31,7 +31,7 @@ export type List = {
   codeHashes: string[];
 };
 
-export const getConfig = async (contract: string): Promise<ERC721CV2Config | undefined> => {
+const getConfig = async (contract: string): Promise<ERC721CV2Config | undefined> => {
   try {
     const token = new Contract(
       contract,
@@ -296,10 +296,12 @@ export const refreshBlacklist = async (transferValidator: string, id: string) =>
   return blacklist;
 };
 
-function getListByConfig(config: ERC721CV2Config): {
+const getListByConfig = (
+  config: ERC721CV2Config
+): {
   whitelist?: string[];
   blacklist?: string[];
-} {
+} => {
   switch (config.transferSecurityLevel) {
     // No restrictions
     case TransferSecurityLevel.One: {
@@ -320,27 +322,21 @@ function getListByConfig(config: ERC721CV2Config): {
       };
     }
   }
-}
+};
 
 export const checkMarketplaceIsFiltered = async (contract: string, operators: string[]) => {
   const config = await getConfigFromDb(contract);
   if (!config) {
-    return { filtered: false, isV2: false };
+    throw new Error("Missing config");
   }
 
   const { whitelist, blacklist } = getListByConfig(config);
 
   if (whitelist) {
-    return {
-      filtered: whitelist.length ? operators.some((op) => !whitelist.includes(op)) : true,
-      isV2: true,
-    };
+    return whitelist.length ? operators.some((op) => !whitelist.includes(op)) : true;
   } else if (blacklist) {
-    return {
-      filtered: blacklist.length ? operators.some((op) => blacklist.includes(op)) : false,
-      isV2: true,
-    };
+    return blacklist.length ? operators.some((op) => blacklist.includes(op)) : false;
   } else {
-    return { filtered: false, isV2: true };
+    return false;
   }
 };
