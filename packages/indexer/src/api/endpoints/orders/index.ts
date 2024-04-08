@@ -29,3 +29,4 @@ export * from "@/api/endpoints/orders/post-orders/v1";
 export * from "@/api/endpoints/orders/post-seaport-offers/v1";
 export * from "@/api/endpoints/orders/get-cross-posting-orders/v1";
 export * from "@/api/endpoints/orders/post-invalidate-orders/v1";
+export * from "@/api/endpoints/orders/get-collection-bids/v1";
