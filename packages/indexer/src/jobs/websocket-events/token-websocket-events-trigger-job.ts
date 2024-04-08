@@ -70,6 +70,10 @@ export class TokenWebsocketEventsTriggerJob extends AbstractRabbitMqJobHandler {
     const contract = data.after.contract;
     const tokenId = data.after.token_id;
 
+    if (config.chainId === 56 && contract === "0x1195cf65f83b3a5768f3c496d3a05ad6412c64b7") {
+      return;
+    }
+
     try {
       const baseQuery = `
         SELECT

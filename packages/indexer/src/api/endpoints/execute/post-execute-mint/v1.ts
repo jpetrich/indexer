@@ -26,6 +26,7 @@ import {
 import { getNFTTransferEvents } from "@/orderbook/mints/simulation";
 import { getExecuteError } from "@/orderbook/orders/errors";
 import { getCurrency } from "@/utils/currencies";
+import * as onChainData from "@/utils/on-chain-data";
 import { ExecutionsBuffer } from "@/utils/executions";
 
 const version = "v1";
@@ -412,6 +413,8 @@ export const postExecuteMintV1Options: RouteOptions = {
               token: collectionMint.contract,
               quantity: item.quantity,
               comment: payload.comment,
+              currency: collectionMint.currency,
+              price: collectionMint.price,
             });
 
             await addToPath(
@@ -499,6 +502,8 @@ export const postExecuteMintV1Options: RouteOptions = {
                     token: mint.contract,
                     quantity: quantityToMint,
                     comment: payload.comment,
+                    currency: mint.currency,
+                    price: mint.price,
                   });
 
                   await addToPath(
@@ -622,6 +627,8 @@ export const postExecuteMintV1Options: RouteOptions = {
                     token: mint.contract,
                     quantity: quantityToMint,
                     comment: payload.comment,
+                    currency: mint.currency,
+                    price: mint.price,
                   });
 
                   await addToPath(
@@ -846,17 +853,6 @@ export const postExecuteMintV1Options: RouteOptions = {
         }[];
       };
 
-      // Set up generic filling steps
-      const steps: StepType[] = [
-        {
-          id: "sale",
-          action: "Confirm transaction in your wallet",
-          description: "To mint these items you must confirm the transaction and pay the gas fee",
-          kind: "transaction",
-          items: [],
-        },
-      ];
-
       const fees = {
         gas: await getJoiPriceObject(
           {
@@ -892,6 +888,9 @@ export const postExecuteMintV1Options: RouteOptions = {
         }
 
         const item = path[0];
+        if (item.currency !== Sdk.Common.Addresses.Native[config.chainId]) {
+          throw Boom.badRequest("Only native token mints are supported");
+        }
 
         const data = await getCrossChainQuote();
         const cost = bn(data.price).add(data.relayerFee);
@@ -1024,7 +1023,13 @@ export const postExecuteMintV1Options: RouteOptions = {
       // - all minted tokens have the taker as the final owner (eg. nothing gets stuck in the router / module)
 
       let safeToUse = true;
-      for (const { txData } of mintsResult.txs) {
+      for (const { txData, approvals } of mintsResult.txs) {
+        // ERC20 mints (which will have a corresponding approval) need to be minted directly
+        if (approvals.length) {
+          safeToUse = false;
+          continue;
+        }
+
         const events = await getNFTTransferEvents(txData);
         if (!events.length) {
           // At least one successful mint
@@ -1070,16 +1075,66 @@ export const postExecuteMintV1Options: RouteOptions = {
       // Check that the transaction sender has enough funds to fill all requested tokens
       const txSender = payload.relayer ?? payload.taker;
 
-      for (const { txData, txTags, orderIds } of txs) {
-        // Get the price in the buy-in currency via the transaction value
-        const totalBuyInCurrencyPrice = bn(txData.value ?? 0);
+      // Set up generic filling steps
+      const steps: StepType[] = [
+        {
+          id: "currency-approval",
+          action: "Approve mint contract",
+          description: "A one-time setup transaction to enable minting",
+          kind: "transaction",
+          items: [],
+        },
+        {
+          id: "sale",
+          action: "Confirm transaction in your wallet",
+          description: "To mint these items you must confirm the transaction and pay the gas fee",
+          kind: "transaction",
+          items: [],
+        },
+      ];
 
-        const balance = await baseProvider.getBalance(txSender);
-        if (!payload.skipBalanceCheck && bn(balance).lt(totalBuyInCurrencyPrice)) {
-          throw getExecuteError("Balance too low to proceed with transaction");
+      for (const { approvals, txData, txTags, orderIds } of txs) {
+        if (approvals.length) {
+          // Get the price in the buy-in currency via the approval amounts
+          const totalBuyInCurrencyPrice = approvals
+            .map((a) => bn(a.amount))
+            .reduce((a, b) => a.add(b), bn(0));
+
+          const erc20 = new Sdk.Common.Helpers.Erc20(baseProvider, approvals[0].currency);
+          const balance = await erc20.getBalance(txSender);
+          if (!payload.skipBalanceCheck && bn(balance).lt(totalBuyInCurrencyPrice)) {
+            throw getExecuteError(
+              "Balance too low to proceed with transaction (use skipBalanceCheck=true to skip balance checking)"
+            );
+          }
+
+          // Handle approvals
+          for (const approval of approvals) {
+            const approvedAmount = await onChainData
+              .fetchAndUpdateFtApproval(approval.currency, approval.owner, approval.operator)
+              .then((a) => a.value);
+
+            const isApproved = bn(approvedAmount).gte(approval.amount);
+            if (!isApproved) {
+              steps[0].items.push({
+                status: "incomplete",
+                data: approval.txData,
+              });
+            }
+          }
+        } else {
+          // Get the price in the buy-in currency via the transaction value
+          const totalBuyInCurrencyPrice = bn(txData.value ?? 0);
+
+          const balance = await baseProvider.getBalance(txSender);
+          if (!payload.skipBalanceCheck && bn(balance).lt(totalBuyInCurrencyPrice)) {
+            throw getExecuteError(
+              "Balance too low to proceed with transaction (use skipBalanceCheck=true to skip balance checking)"
+            );
+          }
         }
 
-        steps[0].items.push({
+        steps[1].items.push({
           status: "incomplete",
           orderIds,
           data: txData,

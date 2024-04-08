@@ -4,8 +4,11 @@ import { config } from "@/config/index";
 import { AbstractRabbitMqJobHandler } from "@/jobs/abstract-rabbit-mq-job-handler";
 import { PendingExpiredBidActivitiesQueue } from "@/elasticsearch/indexes/activities/pending-expired-bid-activities-queue";
 import * as ActivitiesIndex from "@/elasticsearch/indexes/activities";
+import { redis } from "@/common/redis";
 
-const BATCH_SIZE = 5000;
+const BATCH_SIZE = 1000;
+const BATCH_DELAY = 10 * 1000;
+
 const MIN_BATCH_SIZE = [1, 137].includes(config.chainId) ? 1000 : 100;
 
 export default class DeleteArchivedExpiredBidActivitiesJob extends AbstractRabbitMqJobHandler {
@@ -20,11 +23,14 @@ export default class DeleteArchivedExpiredBidActivitiesJob extends AbstractRabbi
     const pendingActivitiesCount = await pendingExpiredBidActivitiesQueue.count();
 
     if (pendingActivitiesCount >= MIN_BATCH_SIZE) {
-      const pendingActivityIds = await pendingExpiredBidActivitiesQueue.get(BATCH_SIZE);
+      const batchSize = Number(await redis.get(`${this.queueName}-batch-size`)) || BATCH_SIZE;
+      const batchDelay = Number(await redis.get(`${this.queueName}-batch-delay`)) || BATCH_DELAY;
+
+      const pendingActivityIds = await pendingExpiredBidActivitiesQueue.get(batchSize);
 
       logger.info(
         this.queueName,
-        `deleting activities. pendingActivitiesCount=${pendingActivityIds?.length}`
+        `deleting activities. pendingActivitiesCount=${pendingActivityIds?.length}, batchSize=${batchSize}, batchDelay=${batchDelay}`
       );
 
       if (pendingActivityIds?.length > 0) {
@@ -41,14 +47,14 @@ export default class DeleteArchivedExpiredBidActivitiesJob extends AbstractRabbi
           await pendingExpiredBidActivitiesQueue.add(pendingActivityIds);
         }
 
-        if (pendingActivitiesCount > BATCH_SIZE) {
-          await deleteArchivedExpiredBidActivitiesJob.addToQueue();
+        if (pendingActivitiesCount > batchSize) {
+          await deleteArchivedExpiredBidActivitiesJob.addToQueue(batchDelay);
         }
       }
     }
   }
 
-  public async addToQueue(delay = 10 * 1000) {
+  public async addToQueue(delay = 0) {
     if (!config.doElasticsearchWork) {
       return;
     }

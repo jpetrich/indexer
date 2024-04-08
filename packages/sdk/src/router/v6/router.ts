@@ -267,11 +267,19 @@ export class Router {
     const txs: FillMintsResult["txs"][0][] = [];
     const success: { [orderId: string]: boolean } = {};
 
+    // Only relevant for ERC20 mints
+    const approvals: FTApproval[] = [];
+
     const sender = options?.relayer ?? taker;
+    const hasNoneNativeMint = details.some(
+      (c) => !isNative(this.chainId, c.currency ?? Sdk.Common.Addresses.Native[this.chainId])
+    );
 
     if (
       !Addresses.MintModule[this.chainId] ||
       options?.forceDirectFilling ||
+      // ERC20 mints
+      hasNoneNativeMint ||
       // Single mints with no fees, no comment and no `relayer` field (only if the mint doesn't have an explicit recipient)
       (details.length === 1 &&
         !details[0].fees?.length &&
@@ -280,8 +288,25 @@ export class Router {
     ) {
       // Under some conditions, we simply return that transaction data back to the caller
 
-      for (const { txData, orderId } of details) {
+      for (const { txData, orderId, currency, price, quantity } of details) {
+        if (price && currency && currency !== Sdk.Common.Addresses.Native[this.chainId]) {
+          approvals.push({
+            currency: currency,
+            amount: bn(price).mul(quantity),
+            owner: taker,
+            operator: txData.to.toLowerCase(),
+            txData: generateFTApprovalTxData(currency, taker, txData.to.toLowerCase()),
+          });
+        }
+
+        // Ensure approvals are unique
+        const uniqueApprovals = uniqBy(
+          approvals,
+          ({ txData: { from, to, data } }) => `${from}-${to}-${data}`
+        );
+
         txs.push({
+          approvals: uniqueApprovals,
           txData: {
             ...txData,
             from: sender,
@@ -327,6 +352,7 @@ export class Router {
         .reduce((a, b) => a.add(b), bn(0))
         .toHexString();
       txs.push({
+        approvals: [],
         txData: {
           from: sender,
           to: this.contracts.router.address,
@@ -5308,6 +5334,13 @@ export class Router {
 
           const tokenId = detail.tokenId;
           order.params.specificIds = [tokenId];
+
+          // TODO: We should be able to fill multiple `specificIds` via the same order
+          // and this way we can also use the ZeroEx module for accurate pricing data,
+          // rather than using the below ugly price adjustment hack.
+
+          // The detail will contain the price to use for the order (we adjust it down to avoid precision issues)
+          order.params.price = bn(detail.price).mul(99).div(100).toString();
 
           // Cover the case where the path is missing
           order.params.path = order.params.path.length
