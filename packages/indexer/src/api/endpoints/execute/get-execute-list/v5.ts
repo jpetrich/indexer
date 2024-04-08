@@ -545,7 +545,7 @@ export const getExecuteListV5Options: RouteOptions = {
           }
 
           // Handle orderbook fee
-          await orderbookFee.attachOrderbookFee(params);
+          await orderbookFee.attachOrderbookFee(params, request.headers["x-api-key"]);
 
           if (
             params.taker &&

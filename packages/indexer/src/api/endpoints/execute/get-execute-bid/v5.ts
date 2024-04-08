@@ -732,7 +732,7 @@ export const getExecuteBidV5Options: RouteOptions = {
           }
 
           // Handle orderbook fee
-          await orderbookFee.attachOrderbookFee(params);
+          await orderbookFee.attachOrderbookFee(params, request.headers["x-api-key"]);
 
           try {
             const WNATIVE = Sdk.Common.Addresses.WNative[config.chainId];

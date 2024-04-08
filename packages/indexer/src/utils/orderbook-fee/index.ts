@@ -1,16 +1,19 @@
 import { AddressZero } from "@ethersproject/constants";
-
 import { OrderKind } from "@/orderbook/orders";
+import { generatePaymentSplit, supportsPaymentSplits } from "@/utils/payment-splits";
 
-const FEE_BPS = 0;
-const FEE_RECIPIENT = AddressZero;
+export const FEE_BPS = 0;
+export const FEE_RECIPIENT = AddressZero;
 
-export const attachOrderbookFee = async (params: {
-  fee?: string[];
-  feeRecipient?: string[];
-  orderKind: OrderKind;
-  orderbook: string;
-}) => {
+export const attachOrderbookFee = async (
+  params: {
+    fee?: string[];
+    feeRecipient?: string[];
+    orderKind: OrderKind;
+    orderbook: string;
+  },
+  apiKey: string
+) => {
   // Only native orders
   if (params.orderbook != "reservoir") {
     return;
@@ -29,10 +32,32 @@ export const attachOrderbookFee = async (params: {
 
     // Skip single fee marketplaces for now
     if (params.fee.length >= 1 && singleFeeOrderKinds.includes(params.orderKind)) {
-      return;
-    }
+      // Skip chains where payment splits are not supported
+      if (!supportsPaymentSplits()) {
+        return;
+      }
 
-    params.fee.push(String(FEE_BPS));
-    params.feeRecipient.push(FEE_RECIPIENT);
+      const paymentSplit = await generatePaymentSplit(
+        apiKey,
+        {
+          recipient: params.feeRecipient[0],
+          bps: Number(params.fee),
+        },
+        {
+          recipient: FEE_RECIPIENT,
+          bps: FEE_BPS,
+        }
+      );
+      if (!paymentSplit) {
+        throw new Error("Could not generate payment split");
+      }
+
+      // Override
+      params.feeRecipient = [paymentSplit.address];
+      params.fee = [String(params.fee.map(Number).reduce((a, b) => a + b) + FEE_BPS)];
+    } else {
+      params.fee.push(String(FEE_BPS));
+      params.feeRecipient.push(FEE_RECIPIENT);
+    }
   }
 };
